@@ -3,10 +3,15 @@
 CC=gcc
 #FORTIFY_SOURCE : protection 1-2
 FLAGS=-Wall -Wextra -Wunused -Wpedantic -pedantic -std=c99 -D_FORTIFY_SOURCE=2
-EXE=brainfuck
+#Program name brainfuck
+BRF=brfk 
 
-$(EXE) : main.c brain.h
-	@$(CC) -o $@ $^ $(FLAGS)
+$(BRF) : main.c brain.h
+	$(CC) -o $@ $^ $(FLAGS)
+
+run : $(BRF)
+	@./$< $(ARGS)
+#./BRF ARGS=file.bf
 
 clear clean rm :
-	@rm $(EXE)
+	@rm $(BRF)
