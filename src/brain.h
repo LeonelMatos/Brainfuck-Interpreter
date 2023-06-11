@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 /*Brainfuck*/
-#define MEM_LEN 3000
+#define MEM_LEN 30000
 /*Terminal*/
 #define RED "\x1B[1;31m"
 #define RST "\x1B[0m" //Reset text color
