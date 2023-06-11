@@ -7,10 +7,8 @@ void interrupt(int *fd, char *source, int ex_status) {
 }
 
 int interpreter(int *src_fd) {
-    char ch;
     int mem_ptr = 0;
-    int src_ptr = 0;
-
+    int src_code = 0;
 
     char p_memory [MEM_LEN+1];
     for (int i=0; i<MEM_LEN; i++)
@@ -23,7 +21,7 @@ int interpreter(int *src_fd) {
         close(src_fd);
         return 1;
     }
-    //Create Array
+    //Create cpy
     char *src_cpy = (char*) malloc(src_len);
     if (src_cpy == NULL) {
         perror("Allocating memory");
@@ -45,7 +43,13 @@ int interpreter(int *src_fd) {
         return 1;
     }
 
-    
+    for (src_code = 0; src_code < src_len; src_code++) {
+        char ch = src_cpy[src_code];
+
+        switch (ch) {
+            case '>'
+        }
+    }
 
 
     close(src_fd);
