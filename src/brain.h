@@ -14,10 +14,14 @@
 typedef enum {
     ERR_NO_INPUT_FILE,
     ERR_FILE_NOT_FOUND, //arg: file
+    ERR_INVALID_INPUT,
+    ERR_WRITING_OUT,
     ERR_COUNT
 } ErrorCode;
 
 const char* errorMessage[] = {
     RED"[ERROR] " RST "no input file to read\n",
     RED"[ERROR] " RST "%s: no such file\n",
+    RED"[ERROR] " RST "invalid input entry\n",
+    RED"[ERROR] " RST "unexpected failure at writing\n",
 };

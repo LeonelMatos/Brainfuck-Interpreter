@@ -1,14 +1,14 @@
 #include "brain.h"
 
-void interrupt(int *fd, char *source, int ex_status) {
+void closesrc(int *fd, char *source, int ex_status) {
     close(fd);
     free(source);
     exit(ex_status);
 }
 
-int interpreter(int *src_fd) {
+void interpreter(int *src_fd) {
     int mem_ptr = 0;
-    int src_code = 0;
+    int src_index = 0;
 
     char p_memory [MEM_LEN+1];
     for (int i=0; i<MEM_LEN; i++)
@@ -35,7 +35,7 @@ int interpreter(int *src_fd) {
         return 1;
     }
     //Copy from src to src_cpy
-    int src_bytesRead = read(src_fd, src_cpy, src_len);
+    ssize_t src_bytesRead = read(src_fd, src_cpy, src_len);
     if (src_bytesRead < 0) {
         perror("Reading from file");
         close(src_fd);
@@ -43,24 +43,60 @@ int interpreter(int *src_fd) {
         return 1;
     }
 
-    for (src_code = 0; src_code < src_len; src_code++) {
-        char ch = src_cpy[src_code];
+    for (src_index = 0; src_index < src_len; src_index++) {
+        char ch = src_cpy[src_index];
 
         switch (ch) {
-            case '>'
+            case '>': /*move right*/
+                if (++mem_ptr == MEM_LEN)
+                    mem_ptr = 0;
+                break;
+            case '<': /*move left*/
+                if (!(mem_ptr--))
+                    mem_ptr = MEM_LEN -1;
+                break;
+            case '+': /*increment*/
+                p_memory[mem_ptr]++;
+                break;
+            case '-': /*decrement*/
+                p_memory[mem_ptr]--;
+                break;
+            case ',': /*read*/
+                ssize_t bytesRead;
+                bytesRead = read(STDIN_FILENO, p_memory[mem_ptr], 1);
+                if (bytesRead < 0) {
+                    perror("Invalid input text");
+                    fprintf(stderr, "%s", errorMessage[ERR_INVALID_INPUT]);
+                    closesrc(&src_fd, src_cpy, 1);
+                }
+                break;
+            case '.': /*write*/
+                ssize_t bytesWrite;
+                bytesWrite = write(STDOUT_FILENO, p_memory[mem_ptr], sizeof(p_memory[mem_ptr]));
+                if (bytesWrite < 0) {
+                    perror("Writing output");
+                    fprintf(stderr, "%s", errorMessage[ERR_INVALID_INPUT]);
+                    closesrc(&src_fd, src_cpy, 1);
+                }
+                break;
+            case '[': /*begin loop*/
+                if (p_memory[mem_ptr] != 0) break;
+                short int is_open = 1;
+                while (is_open) {
+                    if (++src_index == src_len)
+                        closesrc(&src_fd, src_cpy, 1);
+                    /*to continue*/
+                }
+
         }
     }
 
 
     close(src_fd);
     free(src_cpy);
-    return 0;
 }
 
 int main (int argc, char *argv[]) {
-
-    //0 Succ, 1 Err
-    int run_status = 0;
 
     //Check args
     if (2 != argc) {
@@ -74,7 +110,7 @@ int main (int argc, char *argv[]) {
         exit(1);
     }
 
-    run_status = interpreter(&source_fd);
+    interpreter(&source_fd);
 
     return run_status;
 }
